@@ -13,6 +13,11 @@ use Illuminate\Http\RedirectResponse;
 //import Facade "Storage"
 use Illuminate\Support\Facades\Storage;
 
+//import model post
+use App\Models\Post;
+use Illuminate\Database\Eloquent\Collection;
+
+
 class PostController extends Controller
 {    
     /**
@@ -22,11 +27,13 @@ class PostController extends Controller
      */
     public function index(): View
     {
+        $posts = Post::all();
+        
         //get posts
-        Post::latest()->paginate(5);
+        $posts = Post::latest()->paginate(5);
 
         //render view with posts
-        return view('index', compact('posts'));
+        return view('posts.index', compact('posts'));
     }
 
     /**
@@ -36,7 +43,7 @@ class PostController extends Controller
      */
     public function create(): View
     {
-        return view('create');
+        return view('posts.create');
     }
  
     /**
@@ -45,7 +52,7 @@ class PostController extends Controller
      * @param  mixed $request
      * @return RedirectResponse
      */
-    public function store($request): RedirectResponse
+    public function store(Request $request): RedirectResponse
     {
         //validate form
         $this->validate($request, [
@@ -154,10 +161,10 @@ class PostController extends Controller
      * @param  mixed $post
      * @return void
      */
-    public function destroy($post): RedirectResponse
+    public function destroy($id): RedirectResponse
     {
         //get post by ID
-        $post = Post::findOrFail();
+        $post = Post::findOrFail($id);
 
         //delete image
         Storage::delete('public/posts/'. $post->image);
